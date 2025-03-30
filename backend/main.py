@@ -1,7 +1,23 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from database import Base, engine
+from fastapi import Depends
+from sqlalchemy.orm import Session
+from database import SessionLocal
+from models import Customer
+import models
+
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 # Allow requests from your frontend
 origins = [
@@ -20,3 +36,8 @@ app.add_middleware(
 @app.get("/api/summary")
 def get_summary():
     return {"message": "Hello from FastAPI!"}
+
+@app.get("/api/customers")
+def get_customers(db: Session = Depends(get_db)):
+    customers = db.query(Customer).all()
+    return customers    
