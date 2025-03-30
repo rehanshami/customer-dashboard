@@ -40,4 +40,6 @@ def get_summary():
 @app.get("/api/customers")
 def get_customers(db: Session = Depends(get_db)):
     customers = db.query(Customer).all()
-    return customers    
+    if not customers:
+        print("No customers found")
+    return customers
