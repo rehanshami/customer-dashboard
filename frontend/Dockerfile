@@ -12,4 +12,4 @@ RUN npm run build
 
 # Serve using a simple static file server
 RUN npm install -g serve
-CMD ["serve", "-s", "dist", "-l", "3000"]
+CMD ["serve", "-s", "build", "-l", "3000"]
