@@ -1,19 +1,34 @@
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from models import Customer
+import random
 
-sample_customers = [
-    Customer(name="Alice", age=29, location="Auckland", total_spent=450.75),
-    Customer(name="Bob", age=34, location="Wellington", total_spent=300.50),
-    Customer(name="Carol", age=42, location="Christchurch", total_spent=710.10),
-    Customer(name="Dave", age=37, location="Auckland", total_spent=1220.00),
-]
+# Sample locations
+locations = ["Auckland", "Wellington", "Christchurch", "Hamilton", "Tauranga", "Dunedin"]
 
-# Use the same database session
+# Generate realistic customer data
+def generate_customers(n=100):
+    names = [
+        "Alice", "Bob", "Carol", "Dave", "Eve", "Frank", "Grace", "Hank", "Ivy", "Jack",
+        "Kara", "Leo", "Mona", "Nathan", "Olivia", "Paul", "Quinn", "Rachel", "Steve", "Tina",
+        "Uma", "Victor", "Wendy", "Xander", "Yara", "Zane"
+    ]
+    
+    customers = []
+    for _ in range(n):
+        name = random.choice(names) + " " + random.choice(["Smith", "Johnson", "Brown", "Taylor", "Anderson"])
+        age = random.randint(18, 75)
+        location = random.choice(locations)
+        total_spent = round(random.uniform(50, 5000), 2)  # Varied spending habits
+        
+        customers.append(Customer(name=name, age=age, location=location, total_spent=total_spent))
+    
+    return customers
+
+# Insert into database
 db: Session = SessionLocal()
-
-for customer in sample_customers:
-    db.add(customer)
-
+db.bulk_save_objects(generate_customers(120))  # 120 entries for more complexity
 db.commit()
 db.close()
+
+print("Database seeded with 120 customers!")

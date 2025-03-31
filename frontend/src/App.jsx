@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line
 } from 'recharts';
 import { PieChart, Pie, Cell, Legend } from 'recharts';
 import axios from 'axios';
 import { ArrowUp, ArrowDown } from 'lucide-react';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A28DFF', '#FF6666'];
 
 function Dashboard() {
   const [customers, setCustomers] = useState([]);
@@ -24,7 +24,7 @@ function Dashboard() {
         setLoading(false);
       } catch (err) {
         if (retries > 0) {
-          setTimeout(() => fetchCustomers(retries - 1), 3000); // Retry after 3 seconds
+          setTimeout(() => fetchCustomers(retries - 1), 3000);
         } else {
           console.error("Failed to fetch customer data:", err);
           setLoading(false);
@@ -43,6 +43,17 @@ function Dashboard() {
   const pieData = Object.keys(customersByLocation).map(location => ({
     name: location,
     value: customersByLocation[location],
+  }));
+
+  const ageDistribution = filteredCustomers.reduce((acc, curr) => {
+    const ageGroup = `${Math.floor(curr.age / 10) * 10}s`;
+    acc[ageGroup] = (acc[ageGroup] || 0) + 1;
+    return acc;
+  }, {});
+
+  const ageData = Object.keys(ageDistribution).map(ageGroup => ({
+    name: ageGroup,
+    value: ageDistribution[ageGroup],
   }));
 
   const handleFilterChange = (e) => {
@@ -81,93 +92,59 @@ function Dashboard() {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto font-sans">
+    <div className="p-6 max-w-6xl mx-auto font-sans">
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">📊 Customer Insights Dashboard</h1>
         <p className="text-gray-600 text-sm">Visualize customer distribution and spending by location.</p>
       </header>
 
-      {/* Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        {/* Filter */}
-        <div className="flex items-center gap-2">
-          <label htmlFor="location-filter" className="text-gray-700 font-medium">Filter by Location:</label>
-          <select
-            id="location-filter"
-            value={filter}
-            onChange={handleFilterChange}
-            className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="All">All</option>
-            {locations.map(location => (
-              <option key={location} value={location}>{location}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Sorting */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => sortData('asc')}
-            className={`flex items-center gap-1 px-4 py-2 rounded bg-blue-100 text-blue-800 hover:bg-blue-200 transition ${
-              sortOrder === 'asc' ? 'ring-2 ring-blue-400' : ''
-            }`}
-          >
-            <ArrowUp size={16} /> Asc
-          </button>
-          <button
-            onClick={() => sortData('desc')}
-            className={`flex items-center gap-1 px-4 py-2 rounded bg-blue-100 text-blue-800 hover:bg-blue-200 transition ${
-              sortOrder === 'desc' ? 'ring-2 ring-blue-400' : ''
-            }`}
-          >
-            <ArrowDown size={16} /> Desc
-          </button>
-        </div>
-      </div>
-
-      {/* Bar Chart */}
+      {/* Bar Chart - Spending */}
       <section className="mb-12 bg-white rounded-xl shadow p-6">
         <h2 className="text-xl font-semibold mb-4 text-gray-800">💰 Total Spent per Customer</h2>
-        {filteredCustomers.length === 0 ? (
-          <p className="text-gray-500 text-sm">No data available for selected filter.</p>
-        ) : (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={filteredCustomers}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="total_spent" fill="#6366F1" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        )}
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={filteredCustomers}>
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="total_spent" fill="#6366F1" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
       </section>
 
-      {/* Pie Chart */}
+      {/* Pie Chart - Location */}
       <section className="mb-6 bg-white rounded-xl shadow p-6">
         <h2 className="text-xl font-semibold mb-4 text-gray-800">📍 Customers by Location</h2>
-        {pieData.length === 0 ? (
-          <p className="text-gray-500 text-sm">No location data available.</p>
-        ) : (
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={pieData}
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                fill="#8884d8"
-                dataKey="value"
-                label
-              >
-                {pieData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Legend verticalAlign="bottom" height={36} />
-            </PieChart>
-          </ResponsiveContainer>
-        )}
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={pieData}
+              cx="50%"
+              cy="50%"
+              outerRadius={100}
+              fill="#8884d8"
+              dataKey="value"
+              label
+            >
+              {pieData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Legend verticalAlign="bottom" height={36} />
+          </PieChart>
+        </ResponsiveContainer>
+      </section>
+
+      {/* Line Chart - Age Distribution */}
+      <section className="mb-6 bg-white rounded-xl shadow p-6">
+        <h2 className="text-xl font-semibold mb-4 text-gray-800">📈 Age Distribution</h2>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={ageData}>
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Line type="monotone" dataKey="value" stroke="#FF8042" strokeWidth={2} />
+          </LineChart>
+        </ResponsiveContainer>
       </section>
     </div>
   );
