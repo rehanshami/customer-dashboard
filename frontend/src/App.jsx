@@ -113,6 +113,34 @@ function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <section className="bg-white rounded-xl shadow p-6">
+          <h2 className="text-xl font-semibold mb-4">💰 Total Spent by Customer</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={filteredCustomers.slice(0, 20)}>
+              <XAxis dataKey="name" hide />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="total_spent" fill="#6366F1" />
+            </BarChart>
+          </ResponsiveContainer>
+        </section>
+
+        <section className="bg-white rounded-xl shadow p-6">
+          <h2 className="text-xl font-semibold mb-4">📍 Customers by Location</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie data={Object.entries(customersByLocation).map(([key, value]) => ({ name: key, value }))} dataKey="value" outerRadius={100}>
+                {Object.keys(customersByLocation).map((_, index) => (
+                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </section>     
+
+
         <section className="bg-white rounded-xl shadow p-6">
           <h2 className="text-xl font-semibold mb-4">📈 Age Distribution</h2>
           <ResponsiveContainer width="100%" height={300}>
