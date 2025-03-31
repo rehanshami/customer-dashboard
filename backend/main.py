@@ -35,6 +35,11 @@ app.add_middleware(
 )
 
 # Routes
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the Customer Insights Dashboard!"}
+
+
 @app.get("/api/summary")
 def get_summary():
     return {"message": "Hello from FastAPI!"}
