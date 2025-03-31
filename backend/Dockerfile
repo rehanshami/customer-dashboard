@@ -17,6 +17,6 @@ COPY . .
 RUN curl -sSLo /wait-for-it.sh https://github.com/vishnubob/wait-for-it/raw/master/wait-for-it.sh && chmod +x /wait-for-it.sh
 
 # Use the environment variable for the database host
-# Assume that the environment variable DATABASE_HOST is set correctly in Render
-# The default for database host is 'db' if not set, but you may want to modify it
-CMD ["/wait-for-it.sh", "postgresql://postgres_data_ibla_user:ZPA4bDYPYgTrVoj7clC3mQ0ZWt3zYjY2@dpg-cvl0901r0fns7387p1ig-a/postgres_data_ibla:5432", "--", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# The environment variable DATABASE_URL should be set in Render
+
+CMD ["/wait-for-it.sh", "$DATABASE_URL:5432", "--timeout=30", "--", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
