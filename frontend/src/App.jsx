@@ -15,7 +15,7 @@ function Dashboard() {
   const [sortOrder, setSortOrder] = useState(null);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/customers')
+    axios.get('https://customer-dashboard-yw8d.onrender.com/api/customers')
       .then(res => {
         setCustomers(res.data);
         setFilteredCustomers(res.data);
