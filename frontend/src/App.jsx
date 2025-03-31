@@ -13,14 +13,26 @@ function Dashboard() {
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [filter, setFilter] = useState('All');
   const [sortOrder, setSortOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('https://customer-dashboard-yw8d.onrender.com/api/customers')
-      .then(res => {
+    const fetchCustomers = async (retries = 3) => {
+      try {
+        const res = await axios.get('https://customer-dashboard-yw8d.onrender.com/api/customers');
         setCustomers(res.data);
         setFilteredCustomers(res.data);
-      })
-      .catch(err => console.error(err));
+        setLoading(false);
+      } catch (err) {
+        if (retries > 0) {
+          setTimeout(() => fetchCustomers(retries - 1), 3000); // Retry after 3 seconds
+        } else {
+          console.error("Failed to fetch customer data:", err);
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchCustomers();
   }, []);
 
   const customersByLocation = filteredCustomers.reduce((acc, curr) => {
@@ -54,7 +66,19 @@ function Dashboard() {
 
   const locations = [...new Set(customers.map(c => c.location))];
 
-  if (customers.length === 0) return <div className="p-6 text-center text-gray-600">Loading customer insights...</div>;
+  if (loading) {
+    return (
+      <div className="p-6 max-w-5xl mx-auto">
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 bg-gray-200 rounded w-2/3" />
+          <div className="h-6 bg-gray-100 rounded w-1/3" />
+          <div className="h-64 bg-gray-100 rounded" />
+          <div className="h-6 bg-gray-200 rounded w-1/4" />
+          <div className="h-64 bg-gray-100 rounded" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-5xl mx-auto font-sans">
