@@ -21,7 +21,7 @@ def get_db():
 
 # Allow requests from your frontend
 origins = [
-    "http://localhost:5173",  # React (Vite) dev server
+    "http://localhost:3000",  # React (Vite) dev server
 ]
 
 app.add_middleware(
