@@ -35,6 +35,20 @@ function Dashboard() {
     fetchCustomers();
   }, []);
 
+  const handleFilterChange = (e) => {
+    const selected = e.target.value;
+    setFilter(selected);
+    setFilteredCustomers(selected === 'All' ? customers : customers.filter(c => c.location === selected));
+  };
+
+  const sortData = (order) => {
+    const sorted = [...filteredCustomers].sort((a, b) =>
+      order === 'asc' ? a.total_spent - b.total_spent : b.total_spent - a.total_spent
+    );
+    setSortOrder(order);
+    setFilteredCustomers(sorted);
+  };
+
   const customersByLocation = filteredCustomers.reduce((acc, curr) => {
     acc[curr.location] = (acc[curr.location] || 0) + 1;
     return acc;
@@ -53,6 +67,8 @@ function Dashboard() {
     { name: "Top 25%", value: spendingQuartiles[Math.floor(spendingQuartiles.length * 0.75)] }
   ];
 
+  const locations = [...new Set(customers.map(c => c.location))];
+
   if (loading) {
     return (
       <div className="p-6 max-w-5xl mx-auto animate-pulse">
@@ -70,8 +86,33 @@ function Dashboard() {
         <p className="text-gray-600 text-sm">Visualize customer distribution and spending.</p>
       </header>
 
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-2">
+          <label htmlFor="location-filter" className="text-gray-700 font-medium">Filter by Location:</label>
+          <select
+            id="location-filter"
+            value={filter}
+            onChange={handleFilterChange}
+            className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="All">All</option>
+            {locations.map(location => (
+              <option key={location} value={location}>{location}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex gap-2">
+          <button onClick={() => sortData('asc')} className={`flex items-center gap-1 px-4 py-2 rounded bg-blue-100 text-blue-800 hover:bg-blue-200 transition ${sortOrder === 'asc' ? 'ring-2 ring-blue-400' : ''}`}>
+            <ArrowUp size={16} /> Asc
+          </button>
+          <button onClick={() => sortData('desc')} className={`flex items-center gap-1 px-4 py-2 rounded bg-blue-100 text-blue-800 hover:bg-blue-200 transition ${sortOrder === 'desc' ? 'ring-2 ring-blue-400' : ''}`}>
+            <ArrowDown size={16} /> Desc
+          </button>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Bar Chart */}
         <section className="bg-white rounded-xl shadow p-6">
           <h2 className="text-xl font-semibold mb-4">💰 Total Spent by Customer</h2>
           <ResponsiveContainer width="100%" height={300}>
@@ -84,7 +125,6 @@ function Dashboard() {
           </ResponsiveContainer>
         </section>
 
-        {/* Pie Chart */}
         <section className="bg-white rounded-xl shadow p-6">
           <h2 className="text-xl font-semibold mb-4">📍 Customers by Location</h2>
           <ResponsiveContainer width="100%" height={300}>
@@ -96,32 +136,6 @@ function Dashboard() {
               </Pie>
               <Legend />
             </PieChart>
-          </ResponsiveContainer>
-        </section>
-
-        {/* Age Distribution */}
-        <section className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">📈 Age Distribution</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={Object.entries(ageDistribution).map(([key, value]) => ({ name: key, value }))}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="value" fill="#34D399" />
-            </BarChart>
-          </ResponsiveContainer>
-        </section>
-
-        {/* Spending Quartiles */}
-        <section className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">💳 Spending Quartiles</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={quartileData}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="value" stroke="#FF8042" />
-            </LineChart>
           </ResponsiveContainer>
         </section>
       </div>
