@@ -9,6 +9,7 @@ sample_customers = [
     Customer(name="Dave", age=37, location="Auckland", total_spent=1220.00),
 ]
 
+# Use the same database session
 db: Session = SessionLocal()
 
 for customer in sample_customers:
