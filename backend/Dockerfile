@@ -1,4 +1,3 @@
-# backend/Dockerfile
 FROM python:3.11-slim
 
 # Set working directory in container
@@ -17,6 +16,7 @@ COPY . .
 # Download the wait-for-it.sh script and make it executable
 RUN curl -sSLo /wait-for-it.sh https://github.com/vishnubob/wait-for-it/raw/master/wait-for-it.sh && chmod +x /wait-for-it.sh
 
-# Start the application
-CMD ["/wait-for-it.sh", "db:5432", "--", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-
+# Use the environment variable for the database host
+# Assume that the environment variable DATABASE_HOST is set correctly in Render
+# The default for database host is 'db' if not set, but you may want to modify it
+CMD ["/wait-for-it.sh", "customer-dashboard-yw8d.onrender.com:5432", "--", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

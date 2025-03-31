@@ -7,11 +7,13 @@ from database import SessionLocal
 from models import Customer
 import models
 
-
+# Create tables in the database
 Base.metadata.create_all(bind=engine)
 
+# Initialize FastAPI app
 app = FastAPI()
 
+# Dependency to get DB session
 def get_db():
     db = SessionLocal()
     try:
@@ -19,7 +21,7 @@ def get_db():
     finally:
         db.close()
 
-# Allow requests from your frontend
+# CORS configuration
 origins = [
     "http://localhost:3000",  # React (Vite) dev server
 ]
@@ -32,7 +34,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Your existing routes here
+# Routes
 @app.get("/api/summary")
 def get_summary():
     return {"message": "Hello from FastAPI!"}
@@ -43,3 +45,8 @@ def get_customers(db: Session = Depends(get_db)):
     if not customers:
         print("No customers found")
     return customers
+
+# Run the app using Uvicorn when this script is executed directly
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)  # Expose app on all interfaces (0.0.0.0) and port 8000
