@@ -22,4 +22,4 @@ RUN curl -sSLo /wait-for-it.sh https://github.com/vishnubob/wait-for-it/raw/mast
 
 
 # Add a command to run seed.py after the app starts
-CMD ["/wait-for-it.sh", "$DATABASE_URL:5432", "--timeout=30", "--", "python", "seed.py", "&&", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD bash -c "/wait-for-it.sh $(echo $DATABASE_URL | sed -e 's|postgresql://||' -e 's|/.*||'):5432 -- uvicorn main:app --host 0.0.0.0 --port 8000"
