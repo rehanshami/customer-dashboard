@@ -24,7 +24,7 @@ def get_db():
 # CORS configuration
 origins = [
     "http://localhost:3000",  # React (Vite) dev server
-    "https://customer-dashboard-e9kh.onrender.com/"
+    "https://customer-dashboard-yw8d.onrender.com/api/customers"
 ]
 
 app.add_middleware(
