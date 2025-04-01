@@ -54,17 +54,18 @@ Run the FastAPI server:
 ```sh
 uvicorn main:app --reload
 ```
-3. Set up the frontend
+### **3. Set up the frontend** 
 ```sh
 cd frontend
 npm install
 npm run dev
 ```
-4. Run with Docker (Optional)
+### **4. Run with Docker (Optional)** 
+
 ```sh
 docker-compose up --build
 ```
-API Endpoints
+### **5. API Endpoints** 
 ```sh
 Method	Endpoint	Description
 GET	/api/customers	Fetch all customer data
